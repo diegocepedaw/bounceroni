@@ -10,9 +10,13 @@ physics.start()
 physics.setGravity(0,10)
 
 physics.setDrawMode( "normal" )
+local background2 = display.newImageRect( "space.jpg", 360, 570 )
+background2.x = display.contentCenterX
+background2.y = display.contentCenterY
 local background = display.newImageRect( "background.png", 360, 570 )
 local perspective=require("perspective")
 local camera=perspective.createView()
+
 
 local redHerring =  display.newCircle( 160, 240, 10 )
 redHerring.x = display.contentCenterX
@@ -70,8 +74,13 @@ function touch(e)
         rect.x, rect.y, rect.rotation = mid.x, mid.y, angle
 
         rect:setFillColor(0,255,0)
-        physics.addBody( rect, "static", {bounce=1.35} )
-        rect.y = rect.y - 30*redCount
+        if totalLen > 15  then
+             physics.addBody( rect, "static", {bounce=1.3} )
+
+        else
+              physics.addBody( rect, "static", {bounce=1.5} )
+        end
+        rect.y = rect.y - redCount
         camera:add(rect,2,false)
         table.insert( lastLine, rect )
 
@@ -123,7 +132,7 @@ local function createObstacle()
           --stars sends things flying
           local newStar = display.newCircle( 160, 240, 10 )
           newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
-          physics.addBody( newStar, "static", { radius=10, bounce=1 } )
+          physics.addBody( newStar, "static", { radius=15, bounce=1 } )
           newStar.y = redHerring.y -((math.random(1,2)*2)-2)*math.random(1,500)
           newStar.myName = "star"
           newStar.isSensor = true
@@ -131,13 +140,12 @@ local function createObstacle()
      end
      if typeOfObstacle== 2 then
           --planet bumps and starts falling
-          local newPlanet = display.newRect( 0, 0, 25, 25 )
+          local newPlanet = display.newRect( 0, 0, 30, 30 )
           newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
           physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
           newPlanet.y = redHerring.y - ((math.random(1,2)*2)-2)* math.random(1,500)
           newPlanet.myName = "planet"
           newPlanet.gravityScale = 0
-          --newPlanet:applyTorque(3)
           camera:add(newPlanet,2,false)
 
      end
@@ -193,17 +201,17 @@ end
 local function gameLoop()
 
 
-        if ( balloon.x < 0)
+        if ( balloon.x < -5)
         then
-             balloon.x = display.contentHeight
-             balloon.y = balloon.y + 8
+             balloon.x = display.contentWidth
+             balloon.y = balloon.y + 10
         end
-        if ( balloon.x > display.contentHeight )
+        if ( balloon.x > display.contentWidth + 5)
         then
              balloon.x = 0
-             balloon.y = balloon.y + 8
+             balloon.y = balloon.y + 10
         end
-        if (balloon.y > 30*redCount+500) then
+        if (balloon.y > redCount+500) then
             local gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
         end
 
@@ -225,14 +233,17 @@ local function moreObstacles()
      createObstacle()
 end
 --creator = timer.performWithDelay( 5000, moreObstacles, 0 )
+
+local function pan()
+      redHerring.y = redHerring.y - addOn
+end
+
 local counter = 0
+local addOn = 30
 local function onCollision( event )
 
     if ( event.phase == "began" ) then
-        if counter == 4 then
-             moreObstacles()
-             counter = 0
-        end
+
         counter = counter + 1
 
         local obj1 = event.object1
@@ -241,9 +252,15 @@ local function onCollision( event )
              ( obj1.myName == "balloon" and obj2.myName == "line" ) )
 
         then
+             if counter == 4 then
+                  counter = 0
+             end
+             redHerring.y = redHerring.y - addOn
+             redCount = redCount + addOn
+             if addOn < 150 then
+               addOn = addOn + 1
+             end
 
-             redHerring.y = redHerring.y - 30
-             redCount = redCount+1
              tapText.text = 0 -(redHerring.y-240)
              tapText:setFillColor( 0.72, 0.9, 0.16, 0.78 )  -- Tints image green
 
@@ -290,11 +307,12 @@ local function onCollision( event )
 
         if ( obj1.myName == "planet" and obj2.myName == "balloon" ) then
              obj1.gravityScale = 0.75
+             obj1:applyTorque(3)
         end
         if  ( obj1.myName == "balloon" and obj2.myName == "planet" )
         then
             obj2.gravityScale = 0.75
-
+            obj2:applyTorque(3)
         end
 
     end
