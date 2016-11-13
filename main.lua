@@ -5,6 +5,7 @@
 
 require("physics")
 
+
 physics.start()
 
 physics.setGravity(0,10)
@@ -16,7 +17,7 @@ background2.y = display.contentCenterY
 local background = display.newImageRect( "background.png", 360, 570 )
 local perspective=require("perspective")
 local camera=perspective.createView()
-
+local spawnCount = 0
 
 local redHerring =  display.newCircle( 160, 240, 10 )
 redHerring.x = display.contentCenterX
@@ -75,7 +76,7 @@ function touch(e)
 
         rect:setFillColor(0,255,0)
         if totalLen > 15  then
-             physics.addBody( rect, "static", {bounce=1.3} )
+             physics.addBody( rect, "static", {bounce=1.25} )
 
         else
               physics.addBody( rect, "static", {bounce=1.5} )
@@ -132,8 +133,8 @@ local function createObstacle()
           --stars sends things flying
           local newStar = display.newCircle( 160, 240, 10 )
           newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
+          newStar.y = 0 -((math.random(1,2)*2)-2)*math.random(1,500)  - redCount
           physics.addBody( newStar, "static", { radius=15, bounce=1 } )
-          newStar.y = redHerring.y -((math.random(1,2)*2)-2)*math.random(1,500)
           newStar.myName = "star"
           newStar.isSensor = true
           camera:add(newStar,2,false)
@@ -142,8 +143,8 @@ local function createObstacle()
           --planet bumps and starts falling
           local newPlanet = display.newRect( 0, 0, 30, 30 )
           newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
+          newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
           physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
-          newPlanet.y = redHerring.y - ((math.random(1,2)*2)-2)* math.random(1,500)
           newPlanet.myName = "planet"
           newPlanet.gravityScale = 0
           camera:add(newPlanet,2,false)
@@ -197,6 +198,15 @@ local function restorestar(obj)
     } )
 end
 
+local counter = 0
+local addOn = 30
+
+local function moreObstacles()
+     if addOn > 45 then
+          timer.performWithDelay(100, createObstacle, 1)
+     end
+     timer.performWithDelay(100, createObstacle, 1)
+end
 
 local function gameLoop()
 
@@ -220,26 +230,30 @@ end
 gameLoopTimer = timer.performWithDelay( 20, gameLoop, 0 )
 
 
-createObstacle()
-createObstacle()
-createObstacle()
-createObstacle()
 
-local function moreObstacles()
-     createObstacle()
-     createObstacle()
-     createObstacle()
-     createObstacle()
-     createObstacle()
-end
 --creator = timer.performWithDelay( 5000, moreObstacles, 0 )
 
-local function pan()
-      redHerring.y = redHerring.y - addOn
+
+
+
+
+
+
+local function test()
+     redHerring.y = redHerring.y - addOn
+     redCount = redCount + addOn
+     if addOn < 150 then
+       addOn = addOn + 1
+     end
+      counter = counter + 1
+      if counter == 6 then
+           counter = 0
+           moreObstacles()
+      end
 end
 
-local counter = 0
-local addOn = 30
+--gameLoopTimer = timer.performWithDelay( 500, test, 0 )
+
 local function onCollision( event )
 
     if ( event.phase == "began" ) then
@@ -252,14 +266,16 @@ local function onCollision( event )
              ( obj1.myName == "balloon" and obj2.myName == "line" ) )
 
         then
-             if counter == 4 then
-                  counter = 0
-             end
              redHerring.y = redHerring.y - addOn
              redCount = redCount + addOn
              if addOn < 150 then
                addOn = addOn + 1
              end
+              counter = counter + 1
+              if counter == 6 then
+                   counter = 0
+                   moreObstacles()
+              end
 
              tapText.text = 0 -(redHerring.y-240)
              tapText:setFillColor( 0.72, 0.9, 0.16, 0.78 )  -- Tints image green
