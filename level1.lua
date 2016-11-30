@@ -35,7 +35,7 @@ local star
 local planet
 local tapCount = 0
 local tapText
-local counter = 0
+local counter
 local addOn = 30
 
 
@@ -112,7 +112,6 @@ function touch(e)
     end
     return true
 end
-Runtime:addEventListener("touch",touch)
 
 
 local function createObstacle()
@@ -144,7 +143,7 @@ end
 local function pushBalloon()
     balloon:applyLinearImpulse( 0, -0.08, balloon.x, balloon.y )
     tapCount = tapCount + 1
-    tapText.text = tapCount
+
 end
 
 
@@ -213,7 +212,7 @@ local function onCollision( event )
 
     if ( event.phase == "began" ) then
 
-        counter = counter + 1
+
 
         local obj1 = event.object1
         local obj2 = event.object2
@@ -227,6 +226,7 @@ local function onCollision( event )
                addOn = addOn + 1
              end
               counter = counter + 1
+
               if counter == 5 then
                    counter = 0
                    moreObstacles()
@@ -289,7 +289,6 @@ local function onCollision( event )
     end
 end
 
-Runtime:addEventListener( "collision", onCollision )
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -347,14 +346,13 @@ function scene:create( event )
 
 
 
-    tapCount = 0
     tapText = display.newText( 0, display.contentCenterX, 20, native.systemFont, 40 )
 
-    balloon:addEventListener( "tap", pushBalloon )
 
 
 
     tapText:setFillColor( 0, 0, 0 )
+
 
 
 
@@ -387,6 +385,11 @@ function scene:show( event )
 		-- Code here runs when the scene is entirely on screen
 		physics.start()
 		gameLoopTimer = timer.performWithDelay( 20, gameLoop, 0 )
+          counter = 0
+          Runtime:addEventListener("touch",touch)
+          Runtime:addEventListener( "collision", onCollision )
+
+
 
 
 
