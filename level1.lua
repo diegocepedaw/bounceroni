@@ -185,7 +185,9 @@ end
 
 local function endGame()
 
-     composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
+    composer.setVariable( "finalScore", score )
+    composer.removeScene( "highscores" )
+    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
 end
 
 local function gameLoop()
