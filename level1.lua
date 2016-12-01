@@ -38,7 +38,8 @@ local counter
 local addOn = 30
 local score = 0
 local gameOver
-local outerGroup = display.newGroup()
+local outerGroup
+local objectTable = {}
 
 
 function lengthOf( a, b )
@@ -123,6 +124,7 @@ local function createObstacle()
      if typeOfObstacle == 1 then
           --stars sends things flying
           local newStar = display.newCircle( 160, 240, 10 )
+          table.insert( objectTable, newStar )
           outerGroup:insert(newStar)
           newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
           newStar.y = 0 -((math.random(1,2)*2)-2)*math.random(1,500)  - redCount
@@ -134,6 +136,7 @@ local function createObstacle()
      if typeOfObstacle== 2 then
           --planet bumps and starts falling
           local newPlanet = display.newRect( 0, 0, 30, 30 )
+          table.insert( objectTable, newPlanet )
           outerGroup:insert(newPlanet)
           newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
           newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
@@ -327,12 +330,14 @@ function scene:create( event )
      background2.x = display.contentCenterX
      background2.y = display.contentCenterY
      background = display.newImageRect( "background.png", 533, 800 )
+     table.insert( objectTable, background )
      sceneGroup:insert(background)
      perspective=require("perspective")
      camera=perspective.createView()
 
     redHerring =  display.newCircle( 160, 240, 10 )
     sceneGroup:insert(redHerring)
+    table.insert( objectTable, redHerring )
     redHerring.x = display.contentCenterX
     redHerring.y = display.contentCenterY
     redCount = 0
@@ -433,6 +438,12 @@ function scene:hide( event )
           Runtime:removeEventListener("touch",touch)
           Runtime:removeEventListener( "collision", onCollision )
           physics.pause()
+          camera:cancel()
+          for i = #objectTable, 1, -1 do
+     		local thisObject = objectTable[i]
+               display.remove( thisObject )
+               table.remove( objectTable, i )
+          end
 
 	end
 end
