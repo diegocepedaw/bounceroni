@@ -91,9 +91,8 @@ function scene:create( event )
         end
     end
 
-    local menuButton = display.newCircle( 100, 0, 40 )
-    sceneGroup:insert(menuButton)
-    menuButton:addEventListener( "tap", gotoMenu )
+
+    Runtime:addEventListener( "tap", gotoMenu )
 
 
 
