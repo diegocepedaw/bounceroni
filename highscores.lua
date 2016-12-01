@@ -76,11 +76,12 @@ function scene:create( event )
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
-    local highScoresHeader = display.newText( sceneGroup, "High Scores", display.contentCenterX, 100, native.systemFont, 44 )
+    local highScoresHeader = display.newText( sceneGroup, "High Scores", display.contentCenterX, 50, native.systemFont, 44 )
+    local highScoresHeader = display.newText( sceneGroup, "menu", display.contentCenterX, 100, native.systemFont, 20 )
 
     for i = 1, 10 do
         if ( scoresTable[i] ) then
-            local yPos = 150 + ( i * 56 )
+            local yPos = 100 + ( i * 56 )
 
             local rankNum = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, native.systemFont, 36 )
             rankNum:setFillColor( 0.8 )
