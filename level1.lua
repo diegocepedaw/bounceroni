@@ -39,6 +39,7 @@ local addOn = 30
 local score = 0
 local gameOver
 local outerGroup
+local obj
 local objectTable = {}
 
 
@@ -61,6 +62,7 @@ end
 function touch(e)
     local t = e.target
     if (e.phase == "began") then
+
         display.getCurrentStage():setFocus(t)
         totalLen = 0
         local group = display.newGroup()
@@ -77,7 +79,8 @@ function touch(e)
         end
     elseif (e.phase == "moved") then
         local group = e.target
-
+        physics.start()
+        obj.alpha = 0
         local len, angle = lengthOf( group.e, e ), angleOf( group.e, e )
         totalLen = totalLen + len
         if totalLen > 100 then
@@ -105,6 +108,7 @@ function touch(e)
         table.insert( lastLine, rect )
 
 
+
     else
           local group = e.target
           camera:add(group,2,false)
@@ -123,7 +127,7 @@ local function createObstacle()
      local typeOfObstacle = math.random( 2 )
      if typeOfObstacle == 1 then
           --stars sends things flying
-          local newStar = display.newCircle( 160, 240, 10 )
+          local newStar =  display.newImageRect( "saucer.gif", 50, 40 )
           table.insert( objectTable, newStar )
           outerGroup:insert(newStar)
           newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
@@ -135,7 +139,7 @@ local function createObstacle()
      end
      if typeOfObstacle== 2 then
           --planet bumps and starts falling
-          local newPlanet = display.newRect( 0, 0, 30, 30 )
+          local newPlanet =  display.newImageRect( "asteroid.png", 50, 50 )
           table.insert( objectTable, newPlanet )
           outerGroup:insert(newPlanet)
           newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
@@ -310,6 +314,16 @@ local function onCollision( event )
     end
 end
 
+local trans2
+local t1
+
+local function trans1 ()
+        t1 = transition.to(obj, {time=1000, x=display.contentCenterX - 40, onComplete=trans2})
+end
+
+trans2 = function ()
+        t1= transition.to(obj, {time=430, x=display.contentCenterX + 40, onComplete=trans1})
+end
 
 
 
@@ -339,6 +353,7 @@ function scene:create( event )
 
     redHerring =  display.newCircle( 160, 240, 10 )
     sceneGroup:insert(redHerring)
+    redHerring.alpha = 0
     table.insert( objectTable, redHerring )
     redHerring.x = display.contentCenterX
     redHerring.y = display.contentCenterY
@@ -354,7 +369,7 @@ function scene:create( event )
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
-    balloon =  display.newCircle( 160, 240, 10 )
+    balloon =  display.newImageRect( "blob.png", 35, 35 )
     balloon.myName = "balloon"
     balloon.x = display.contentCenterX
     balloon.y = display.contentCenterY
@@ -381,6 +396,14 @@ function scene:create( event )
 
 
     tapText:setFillColor( 0, 0, 0 )
+
+    obj = display.newImageRect( "touch.png", 40, 40)
+    obj.x = display.contentCenterX - 40
+    obj.y = 350
+
+
+
+
 
 
 
@@ -411,11 +434,12 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-		physics.start()
+
 		gameLoopTimer = timer.performWithDelay( 20, gameLoop, 0 )
           counter = 0
           Runtime:addEventListener("touch",touch)
           Runtime:addEventListener( "collision", onCollision )
+          trans1()
 
 
 
