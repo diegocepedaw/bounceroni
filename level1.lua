@@ -63,6 +63,8 @@ function touch(e)
     local t = e.target
     if (e.phase == "began") then
 
+        physics.start()
+
         display.getCurrentStage():setFocus(t)
         totalLen = 0
         local group = display.newGroup()
@@ -79,43 +81,52 @@ function touch(e)
         end
     elseif (e.phase == "moved") then
         local group = e.target
-        physics.start()
-        obj.alpha = 0
-        local len, angle = lengthOf( group.e, e ), angleOf( group.e, e )
-        totalLen = totalLen + len
-        if totalLen > 100 then
-             return true
+        if group ~= nil then
+
+             obj.alpha = 0
+             local len, angle = lengthOf( group.e, e ), angleOf( group.e, e )
+             totalLen = totalLen + len
+             if totalLen > 100 then
+                  return true
+             end
+
+             local mid = { x=(group.e.x+e.x)/2, y=(group.e.y+e.y)/2 }
+             group.e = e
+             local rect = display.newRect( group, 0, 0, len, 5 )
+
+
+             rect.myName = "line"
+
+             rect.x, rect.y, rect.rotation = mid.x, mid.y, angle
+
+             rect:setFillColor(0,255,0)
+             if totalLen > 20  then
+                  physics.addBody( rect, "static", {bounce=1.28} )
+
+             else
+                   physics.addBody( rect, "static", {bounce=0.8} )
+             end
+             rect.y = rect.y - redCount
+             camera:add(rect,2,false)
+             table.insert( lastLine, rect )
         end
 
-        local mid = { x=(group.e.x+e.x)/2, y=(group.e.y+e.y)/2 }
-        group.e = e
-        local rect = display.newRect( group, 0, 0, len, 5 )
 
 
-        rect.myName = "line"
-
-        rect.x, rect.y, rect.rotation = mid.x, mid.y, angle
-
-        rect:setFillColor(0,255,0)
-        if totalLen > 20  then
-             physics.addBody( rect, "static", {bounce=1.28} )
-
-        else
-              physics.addBody( rect, "static", {bounce=0.8} )
-        end
-        rect.y = rect.y - redCount
-        camera:add(rect,2,false)
-        table.insert( lastLine, rect )
 
 
 
     else
+
           local group = e.target
-          camera:add(group,2,false)
+          if group ~= nil then
+               camera:add(group,2,false)
 
 
-        group:removeEventListener("touch",touch)
-        display.getCurrentStage():setFocus(nil)
+             group:removeEventListener("touch",touch)
+             display.getCurrentStage():setFocus(nil)
+          end
+
 
     end
     return true
@@ -458,6 +469,13 @@ function scene:hide( event )
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
           timer.cancel( gameLoopTimer)
+          if next(lastLine) ~= nil then
+              for i = #lastLine, 1, -1 do
+                   local thisLine = lastLine[i]
+                   display.remove(thisLine)
+                   table.remove( lastLine, i )
+              end
+         end
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
 
