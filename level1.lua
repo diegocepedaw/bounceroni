@@ -218,7 +218,7 @@ local function gameLoop()
              balloon.x = 0
              balloon.y = balloon.y + 10
         end
-        if (balloon.y > redCount+500) then
+        if (balloon.y > redHerring.y - addOn +500) then
             gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
             outerGroup:insert(gameOver)
 
