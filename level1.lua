@@ -13,7 +13,7 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 local physics = require("physics")
 physics.start()
-physics.setGravity(0,10)
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -28,8 +28,7 @@ local redHerring
 local lastLine ={}
 local PI = (4*math.atan(1))
 local quickPI = 180 / PI
-local totalLen
-local platform
+local totalLen = 0
 local balloon
 local star
 local planet
@@ -37,7 +36,9 @@ local tapCount = 0
 local tapText
 local counter
 local addOn = 30
-
+local score = 0
+local gameOver
+local outerGroup = display.newGroup()
 
 
 function lengthOf( a, b )
@@ -51,6 +52,8 @@ end
 function angleOf( a, b )
     return math.atan2( b.y - a.y, b.x - a.x ) * quickPI
 end
+
+
 
 
 
@@ -115,10 +118,12 @@ end
 
 
 local function createObstacle()
+
      local typeOfObstacle = math.random( 2 )
      if typeOfObstacle == 1 then
           --stars sends things flying
           local newStar = display.newCircle( 160, 240, 10 )
+          outerGroup:insert(newStar)
           newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
           newStar.y = 0 -((math.random(1,2)*2)-2)*math.random(1,500)  - redCount
           physics.addBody( newStar, "static", { radius=15, bounce=1 } )
@@ -129,6 +134,7 @@ local function createObstacle()
      if typeOfObstacle== 2 then
           --planet bumps and starts falling
           local newPlanet = display.newRect( 0, 0, 30, 30 )
+          outerGroup:insert(newPlanet)
           newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
           newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
           physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
@@ -174,6 +180,11 @@ local function moreObstacles()
      timer.performWithDelay(100, createObstacle, 1)
 end
 
+local function endGame()
+
+     composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
+end
+
 local function gameLoop()
 
 
@@ -188,7 +199,11 @@ local function gameLoop()
              balloon.y = balloon.y + 10
         end
         if (balloon.y > redCount+500) then
-            local gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
+            gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
+            outerGroup:insert(gameOver)
+
+            endGame()
+
         end
 
 end
@@ -233,6 +248,7 @@ local function onCollision( event )
               end
 
              tapText.text = 0 -(redHerring.y-240)
+             score = 0 -(redHerring.y-240)
              tapText:setFillColor( 0.72, 0.9, 0.16, 0.78 )  -- Tints image green
 
 
@@ -290,23 +306,33 @@ local function onCollision( event )
 end
 
 
+
+
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
 
 -- create()
 function scene:create( event )
+     local sceneGroup = self.view
 
-	local sceneGroup = self.view
+     outerGroup = display.newGroup()  -- Display group for the background image
+	sceneGroup:insert( outerGroup )
+
+     physics.setGravity(0,10)
 	physics.pause()
 	background2 = display.newImageRect( "space.jpg", 360, 570 )
-    background2.x = display.contentCenterX
-    background2.y = display.contentCenterY
+     sceneGroup:insert(background2)
+     background2.x = display.contentCenterX
+     background2.y = display.contentCenterY
      background = display.newImageRect( "background.png", 533, 800 )
+     sceneGroup:insert(background)
      perspective=require("perspective")
      camera=perspective.createView()
 
     redHerring =  display.newCircle( 160, 240, 10 )
+    sceneGroup:insert(redHerring)
     redHerring.x = display.contentCenterX
     redHerring.y = display.contentCenterY
     redCount = 0
@@ -320,9 +346,6 @@ function scene:create( event )
 
     background.x = display.contentCenterX
     background.y = display.contentCenterY
-    platform = display.newImageRect( "platform.png", 300, 50 )
-    platform.x = display.contentCenterX
-    platform.y = display.contentHeight-25
 
     balloon =  display.newCircle( 160, 240, 10 )
     balloon.myName = "balloon"
@@ -338,7 +361,7 @@ function scene:create( event )
 
     camera:add(background,2,false)
     camera:add(balloon,2,false)
-    camera:add(platform,2,false)
+
 
 
     camera:track()
@@ -347,12 +370,10 @@ function scene:create( event )
 
 
     tapText = display.newText( 0, display.contentCenterX, 20, native.systemFont, 40 )
-
-
+    sceneGroup:insert(tapText)
 
 
     tapText:setFillColor( 0, 0, 0 )
-
 
 
 
@@ -405,9 +426,13 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-
+          timer.cancel( gameLoopTimer)
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
+
+          Runtime:removeEventListener("touch",touch)
+          Runtime:removeEventListener( "collision", onCollision )
+          physics.pause()
 
 	end
 end

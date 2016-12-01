@@ -10,6 +10,10 @@ local widget = require "widget"
 -- forward declarations and other locals
 local playBtn
 
+local function gotoGame()
+    composer.removeScene( "level1")
+    composer.gotoScene( "menu", { time=800, effect="crossFade" } )
+end
 -- 'onRelease' event listener for playBtn
 local function onPlayBtnRelease()
 
