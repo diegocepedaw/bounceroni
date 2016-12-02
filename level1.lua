@@ -41,7 +41,7 @@ local gameOver
 local outerGroup
 local obj
 local objectTable = {}
-local a, b, c
+local r, g, b
 
 function lengthOf( a, b )
     local width, height = b.x-a.x, b.y-a.y
@@ -100,7 +100,7 @@ function touch(e)
 
              rect.x, rect.y, rect.rotation = mid.x, mid.y, angle
 
-             rect:setFillColor(a,b,c )
+             rect:setFillColor(r,g,b )
 
              if totalLen > 20  then
                   physics.addBody( rect, "static", {bounce=1.28} )
@@ -127,7 +127,11 @@ function touch(e)
 
              group:removeEventListener("touch",touch)
              display.getCurrentStage():setFocus(nil)
-              a, b, c = math.random(0,1), math.random(0,1), math.random(0,1)
+              r, g, b = math.random(0,1), math.random(0,1), math.random(0,1)
+              if (r +b+g == 0 ) then
+                   g= 1
+
+              end
           end
 
 
@@ -251,13 +255,8 @@ end
 
 
 local function onCollision( event )
-     a, b, c = math.random(0,1), math.random(0,1), math.random(0,1)
-      if redHerring.y == nil then
 
 
-          event.contact.isEnabled = false
-          return
-     end
     if ( event.phase == "began" ) then
 
 
@@ -429,7 +428,10 @@ function scene:create( event )
     obj.x = display.contentCenterX - 40
     obj.y = 350
 
-    a, b, c = math.random(0,1), math.random(0,1), math.random(0,1)
+     r,g,b = math.random(0.2,1), math.random(0.2,1), math.random(0.2,1)
+     if (a == 0 and b == 0 and c == 0) then
+          b = 1
+     end
 
 
 
