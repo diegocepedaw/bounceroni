@@ -42,6 +42,29 @@ local outerGroup
 local obj
 local objectTable = {}
 local r, g, b
+local newHigh
+local hsFlag = 0
+
+local json = require( "json" )
+
+local scoresTable = {}
+
+local filePath = system.pathForFile( "scores.json", system.DocumentsDirectory )
+
+local function loadScores()
+
+    local file = io.open( filePath, "r" )
+
+    if file then
+        local contents = file:read( "*a" )
+        io.close( file )
+        scoresTable = json.decode( contents )
+    end
+
+    if ( scoresTable == nil or #scoresTable == 0 ) then
+        scoresTable = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    end
+end
 
 function lengthOf( a, b )
     local width, height = b.x-a.x, b.y-a.y
@@ -171,12 +194,6 @@ local function createObstacle()
 end
 
 
-local function pushBalloon()
-    balloon:applyLinearImpulse( 0, -0.08, balloon.x, balloon.y )
-    tapCount = tapCount + 1
-
-end
-
 
 local function restorestar(obj)
 
@@ -236,6 +253,15 @@ local function gameLoop()
 
              end
          end
+
+         if (score > scoresTable[1]and hsFlag == 0) then
+              hsFlag = 1
+              newHigh = display.newImage("hsBanner.png")
+              t1 = transition.to(newHigh, {time=4500, x=display.contentCenterX + 500 })
+              table.insert( objectTable, newHigh )
+          end
+
+
 
 end
 
@@ -299,14 +325,14 @@ local function onCollision( event )
 
         if ( obj1.myName == "star" and obj2.myName == "balloon" ) then
              obj1.alpha = 0.2
-             if obj.isBodyActive == true then
+
                   balloon:setLinearVelocity( 0, 0 )
                   balloon.y = balloon.y -10
                   local xForce = ((math.random(1,2)*2)-3)/10
                   balloon:applyLinearImpulse( xForce, -0.1, balloon.x, balloon.y )
                   display.remove( obj1 )
-             end
-             obj1.isBodyActive = false
+
+            -- obj1.isBodyActive = false
 
              -- Fade in the ship
 
@@ -316,14 +342,14 @@ local function onCollision( event )
              obj2.alpha = 0.2
 
 
-             if obj2.isBodyActive == true then
+
                   balloon:setLinearVelocity( 0, 0 )
                   balloon.y = balloon.y -10
                   local xForce = ((math.random(1,2)*2)-3)/10
                   balloon:applyLinearImpulse( xForce, -0.1, balloon.x, balloon.y )
                   display.remove( obj2 )
-             end
-             obj2.isBodyActive = false
+
+             --obj2.isBodyActive = false
              -- Fade in the ship
 
         end
@@ -432,6 +458,8 @@ function scene:create( event )
      if (a == 0 and b == 0 and c == 0) then
           b = 1
      end
+     loadScores()
+     hsFlag = 0
 
 
 
