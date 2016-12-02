@@ -33,7 +33,7 @@ local balloon
 local star
 local planet
 local tapCount = 0
-local tapText
+local tapText = 0
 local counter
 local addOn = 30
 local score = 0
@@ -150,7 +150,7 @@ local function createObstacle()
      end
      if typeOfObstacle== 2 then
           --planet bumps and starts falling
-          local newPlanet =  display.newImageRect( "asteroid.png", 50, 50 )
+          local newPlanet =  display.newImageRect( "asteroid.PNG", 65, 60 )
           table.insert( objectTable, newPlanet )
           outerGroup:insert(newPlanet)
           newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
@@ -218,13 +218,17 @@ local function gameLoop()
              balloon.x = 0
              balloon.y = balloon.y + 10
         end
-        if (balloon.y > redHerring.y - addOn +500) then
-            gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
-            outerGroup:insert(gameOver)
+        if (balloon.y ~= nil and redHerring.y ~= nil) then
 
-            endGame()
 
-        end
+             if (balloon.y > redHerring.y - addOn +500) then
+                 gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
+                 table.insert( objectTable, gameOver )
+
+                 endGame()
+
+             end
+         end
 
 end
 
@@ -233,7 +237,7 @@ local function test()
      redHerring.y = redHerring.y - addOn
      redCount = redCount + addOn
      if addOn < 150 then
-       addOn = addOn + 1
+       addOn = addOn + 1.5
      end
       counter = counter + 1
       if counter == 6 then
@@ -244,7 +248,12 @@ end
 
 
 local function onCollision( event )
+      if redHerring.y == nil then
 
+
+          event.contact.isEnabled = false
+          return
+     end
     if ( event.phase == "began" ) then
 
 
@@ -255,8 +264,11 @@ local function onCollision( event )
              ( obj1.myName == "balloon" and obj2.myName == "line" ) )
 
         then
-             redHerring.y = redHerring.y - addOn
-             redCount = redCount + addOn
+             if redHerring.y ~= nil then
+                  redHerring.y = redHerring.y - addOn
+                  redCount = redCount + addOn
+
+
              if addOn < 150 then
                addOn = addOn + 1
              end
@@ -268,9 +280,10 @@ local function onCollision( event )
               end
 
              tapText.text = 0 -(redHerring.y-240)
+             table.insert( objectTable, tapText )
              score = 0 -(redHerring.y-240)
              tapText:setFillColor( 0.72, 0.9, 0.16, 0.78 )  -- Tints image green
-
+             end
 
              --camera:toPoint(redHerring.x, redHerring.y)
 
@@ -446,7 +459,7 @@ function scene:show( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
 
-		gameLoopTimer = timer.performWithDelay( 20, gameLoop, 0 )
+		gameLoopTimer = timer.performWithDelay( 2000, gameLoop, 0 )
           counter = 0
           Runtime:addEventListener("touch",touch)
           Runtime:addEventListener( "collision", onCollision )
