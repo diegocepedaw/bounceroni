@@ -538,6 +538,12 @@ function scene:hide( event )
                table.remove( objectTable, i )
           end
 
+             for i = #lastLine, 1, -1 do
+                  local thisLine = lastLine[i]
+                  display.remove(thisLine)
+                  table.remove( lastLine, i )
+             end
+
 	end
 end
 
