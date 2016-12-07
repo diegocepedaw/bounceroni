@@ -239,7 +239,7 @@ end
 
 local function gameLoop()
 
-
+        balloon.rotation = 0
         if ( balloon.x < -5)
         then
              balloon.x = display.contentWidth
@@ -447,7 +447,7 @@ function scene:create( event )
 
     --physics.addBody( platform, "static" )
     physics.addBody( balloon, "dynamic", { radius=15, bounce=0 } )
-
+    balloon.isFixedRotation = true
 
     camera:add(background,2,false)
     camera:add(balloon,2,false)
