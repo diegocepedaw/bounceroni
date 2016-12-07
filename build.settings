@@ -5,6 +5,40 @@
 
 settings =
 {
+	plugins =
+	 {
+	   ["plugin.google.play.services"] =
+	   {
+		publisherId = "com.coronalabs",
+		supportedPlatforms = { android=true }
+	   },
+	   ["shared.android.support.v4"] =
+	   {
+		publisherId = "com.coronalabs",
+		supportedPlatforms = { android=true }
+	   },
+	   ["plugin.coronaAds"] =
+	   {
+		publisherId = "com.coronalabs",
+		supportedPlatforms = { android=true, ["amazon-kindle"]=true, iphone=true }
+	   },
+	   ["plugin.chartboost"] =
+	   {
+		publisherId = "com.coronalabs",
+		supportedPlatforms = { android=true, ["amazon-kindle"]=true, iphone=true }
+	   }
+	},
+	-- If building for iOS, add these three entries to the "plist" table
+	iphone =
+	{
+	 plist =
+	 {
+	   NSAppTransportSecurity = { NSAllowsArbitraryLoads=true },
+	   NSLocationAlwaysUsageDescription = { "" },
+	   NSLocationWhenInUseUsageDescription = { "" },
+	 },
+	},
+
 	orientation =
 	{
 		-- Supported values for orientation:
@@ -13,7 +47,7 @@ settings =
 		default = "portrait",
 		supported = { "portrait", },
 	},
-	
+
 	excludeFiles =
 	{
 		-- Include only the necessary icon files on each platform
@@ -54,7 +88,7 @@ settings =
 			},
 		},
 	},
-	
+
 	--
 	-- Android Section
 	--

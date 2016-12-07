@@ -44,6 +44,14 @@ local objectTable = {}
 local r, g, b
 local newHigh
 local hsFlag = 0
+local bounceSound = audio.loadSound( "bounce.wav" )
+local bumpSound = audio.loadSound( "bump.wav" )
+local launchSound = audio.loadSound( "star.wav" )
+local over = audio.loadSound( "over.wav")
+local hsSound = audio.loadSound( "newHs.ogg")
+local backgroundMusic = audio.loadStream( "background.wav" )
+audio.setVolume( 0.1, { channel=1 } )
+
 
 local json = require( "json" )
 
@@ -247,6 +255,7 @@ local function gameLoop()
 
              if (balloon.y > redHerring.y - addOn +500) then
                  gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
+                 local laserChannel = audio.play( over )
                  table.insert( objectTable, gameOver )
 
                  endGame()
@@ -259,6 +268,7 @@ local function gameLoop()
               newHigh = display.newImage("hsBanner.png")
               t1 = transition.to(newHigh, {time=4500, x=display.contentCenterX + 500 })
               table.insert( objectTable, newHigh )
+              local hsChannel = audio.play( hsSound )
           end
 
 
@@ -293,6 +303,8 @@ local function onCollision( event )
              ( obj1.myName == "balloon" and obj2.myName == "line" ) )
 
         then
+             audio.play( bounceSound , { channel=2 } )
+             audio.setVolume( 0.3, { channel=2 } )
              if redHerring.y ~= nil then
                   redHerring.y = redHerring.y - addOn
                   redCount = redCount + addOn
@@ -325,12 +337,13 @@ local function onCollision( event )
 
         if ( obj1.myName == "star" and obj2.myName == "balloon" ) then
              obj1.alpha = 0.2
-
+                  audio.play( launchSound )
                   balloon:setLinearVelocity( 0, 0 )
                   balloon.y = balloon.y -10
                   local xForce = ((math.random(1,2)*2)-3)/10
                   balloon:applyLinearImpulse( xForce, -0.1, balloon.x, balloon.y )
                   display.remove( obj1 )
+
 
             -- obj1.isBodyActive = false
 
@@ -342,7 +355,7 @@ local function onCollision( event )
              obj2.alpha = 0.2
 
 
-
+                  audio.play( launchSound )
                   balloon:setLinearVelocity( 0, 0 )
                   balloon.y = balloon.y -10
                   local xForce = ((math.random(1,2)*2)-3)/10
@@ -357,11 +370,13 @@ local function onCollision( event )
         if ( obj1.myName == "planet" and obj2.myName == "balloon" ) then
              obj1.gravityScale = 0.75
              obj1:applyTorque(3)
+             local soundChannel = audio.play( bumpSound )
         end
         if  ( obj1.myName == "balloon" and obj2.myName == "planet" )
         then
             obj2.gravityScale = 0.75
             obj2:applyTorque(3)
+            local soundChannel = audio.play( bumpSound )
         end
 
     end
@@ -460,6 +475,8 @@ function scene:create( event )
      end
      loadScores()
      hsFlag = 0
+     audio.play( backgroundMusic , { channel=1 , loops=-1} )
+
 
 
 
@@ -527,10 +544,9 @@ function scene:hide( event )
          end
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-
+          physics.pause()
           Runtime:removeEventListener("touch",touch)
           Runtime:removeEventListener( "collision", onCollision )
-          physics.pause()
           camera:cancel()
           for i = #objectTable, 1, -1 do
      		local thisObject = objectTable[i]
@@ -543,6 +559,7 @@ function scene:hide( event )
                   display.remove(thisLine)
                   table.remove( lastLine, i )
              end
+             audio.fadeOut( { channel=backgroundMusic, time=1000 } )
 
 	end
 end

@@ -10,6 +10,21 @@ local scoresTable = {}
 
 local filePath = system.pathForFile( "scores.json", system.DocumentsDirectory )
 
+local coronaAds = require( "plugin.coronaAds" )
+-- Substitute your own placement IDs when generated
+local bannerPlacement = "bottom-banner-320x50"
+--local interstitialPlacement = "interstitial-1"
+
+-- Corona Ads listener function
+local function adListener( event )
+
+   -- Successful initialization of Corona Ads
+   if ( event.phase == "init" ) then
+     -- Show an ad
+     coronaAds.show( bannerPlacement, false )
+     --coronaAds.show( interstitialPlacement, true )
+   end
+end
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -54,6 +69,7 @@ end
 function scene:create( event )
 
      local sceneGroup = self.view
+     coronaAds.init( "b658f8b9-74d9-41de-b282-1b26ebec6683", adListener )
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
     -- Load the previous scores
@@ -127,7 +143,7 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-
+          coronaAds.hide( bannerPlacement )
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
               Runtime:removeEventListener( "tap", gotoMenu )
@@ -139,6 +155,7 @@ end
 function scene:destroy( event )
 
 	local sceneGroup = self.view
+     Runtime:removeEventListener( "tap", gotoMenu )
 	-- Code here runs prior to the removal of scene's view
 
 end
