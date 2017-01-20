@@ -50,6 +50,7 @@ local launchSound = audio.loadSound( "star.wav" )
 local over = audio.loadSound( "over.wav")
 local hsSound = audio.loadSound( "newHs.ogg")
 local backgroundMusic = audio.loadStream( "background.wav" )
+local typeOfPlanet
 audio.setVolume( 0.1, { channel=1 } )
 
 
@@ -115,7 +116,7 @@ function touch(e)
         local group = e.target
         if group ~= nil then
 
-             obj.alpha = 0
+             display.remove( obj )
              local len, angle = lengthOf( group.e, e ), angleOf( group.e, e )
              totalLen = totalLen + len
              if totalLen > 100 then
@@ -176,7 +177,7 @@ local function createObstacle()
      local typeOfObstacle = math.random( 2 )
      if typeOfObstacle == 1 then
           --stars sends things flying
-          local newStar =  display.newImageRect( "saucer.gif", 50, 40 )
+          local newStar =  display.newImageRect( "saucer.gif", 50, 50 )
           table.insert( objectTable, newStar )
           outerGroup:insert(newStar)
           newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
@@ -188,15 +189,50 @@ local function createObstacle()
      end
      if typeOfObstacle== 2 then
           --planet bumps and starts falling
-          local newPlanet =  display.newImageRect( "asteroid.PNG", 65, 60 )
-          table.insert( objectTable, newPlanet )
-          outerGroup:insert(newPlanet)
-          newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
-          newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
-          physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
-          newPlanet.myName = "planet"
-          newPlanet.gravityScale = 0
-          camera:add(newPlanet,2,false)
+
+          typeOfPlanet = math.random( 3 )
+          local planetType
+          if typeOfPlanet == 1 or typeOfPlanet == 4 or typeOfPlanet == 6 then
+               planetType =   "planet1.png"
+               local newPlanet =  display.newImageRect( "planet1.PNG", 60, 60 )
+               table.insert( objectTable, newPlanet )
+               outerGroup:insert(newPlanet)
+               newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
+               newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
+               physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
+               newPlanet.myName = "planet"
+               newPlanet.gravityScale = 0
+               camera:add(newPlanet,2,false)
+               typeOfPlanet = math.random( 3 )
+          end
+          if typeOfPlanet == 2   then
+               planetType =   "planet2.png"
+               local newPlanet =  display.newImageRect( "planet2.png", 70, 70 )
+               table.insert( objectTable, newPlanet )
+               outerGroup:insert(newPlanet)
+               newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
+               newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
+               physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
+               newPlanet.myName = "planet"
+               newPlanet.gravityScale = 0
+               camera:add(newPlanet,2,false)
+               typeOfPlanet = math.random( 3 )
+          end
+          if typeOfPlanet == 3 or typeOfPlanet == 5 or typeOfPlanet == 7 then
+               planetType =  "planet3.png"
+               local newPlanet =  display.newImageRect( "planet3.png", 60, 60 )
+               table.insert( objectTable, newPlanet )
+               outerGroup:insert(newPlanet)
+               newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
+               newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
+               physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
+               newPlanet.myName = "planet"
+               newPlanet.gravityScale = 0
+               camera:add(newPlanet,2,false)
+               typeOfPlanet = math.random( 3 )
+          end
+
+
 
      end
 end
@@ -234,7 +270,7 @@ local function endGame()
 
     composer.setVariable( "finalScore", score )
     composer.removeScene( "highscores" )
-    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
+    composer.gotoScene( "highscores", "fade", 800 )
 end
 
 local function gameLoop()
@@ -254,7 +290,7 @@ local function gameLoop()
 
 
              if (balloon.y > redHerring.y - addOn +500) then
-                 gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, native.systemFont, 40 )
+                 gameOver = display.newText( "GAME OVER", display.contentCenterX, 60, "IndieFlower.ttf", 40 )
                  local laserChannel = audio.play( over )
                  table.insert( objectTable, gameOver )
 
@@ -343,6 +379,8 @@ local function onCollision( event )
                   local xForce = ((math.random(1,2)*2)-3)/10
                   balloon:applyLinearImpulse( xForce, -0.1, balloon.x, balloon.y )
                   display.remove( obj1 )
+                  score = score + 44
+                  tapText.text = score
 
 
             -- obj1.isBodyActive = false
@@ -361,6 +399,8 @@ local function onCollision( event )
                   local xForce = ((math.random(1,2)*2)-3)/10
                   balloon:applyLinearImpulse( xForce, -0.1, balloon.x, balloon.y )
                   display.remove( obj2 )
+                  score = score + 44
+                  tapText.text = score
 
              --obj2.isBodyActive = false
              -- Fade in the ship
@@ -386,7 +426,7 @@ local trans2
 local t1
 
 local function trans1 ()
-        t1 = transition.to(obj, {time=1000, x=display.contentCenterX - 40, onComplete=trans2})
+        t1 = transition.to(obj, {time=800, x=display.contentCenterX - 40, onComplete=trans2})
 end
 
 trans2 = function ()
@@ -441,9 +481,8 @@ function scene:create( event )
     balloon.myName = "balloon"
     balloon.x = display.contentCenterX
     balloon.y = display.contentCenterY
-    balloon.alpha = 0.8
     balloon.gravityScale = 2
-    balloon:setFillColor( 0.72, 0.9, 0.16, 0.78 )
+
 
     --physics.addBody( platform, "static" )
     physics.addBody( balloon, "dynamic", { radius=15, bounce=0 } )
@@ -459,7 +498,7 @@ function scene:create( event )
 
 
 
-    tapText = display.newText( 0, display.contentCenterX, 20, native.systemFont, 40 )
+    tapText = display.newText( 0, display.contentCenterX, 20, "IndieFlower.ttf", 40 )
     sceneGroup:insert(tapText)
 
 
@@ -468,6 +507,8 @@ function scene:create( event )
     obj = display.newImageRect( "touch.png", 40, 40)
     obj.x = display.contentCenterX - 40
     obj.y = 350
+    local firstTran = transition.to(obj, {time=430, x=display.contentCenterX + 40, onComplete=trans2})
+
 
      r,g,b = math.random(0.2,1), math.random(0.2,1), math.random(0.2,1)
      if (a == 0 and b == 0 and c == 0) then
@@ -475,7 +516,10 @@ function scene:create( event )
      end
      loadScores()
      hsFlag = 0
-     audio.play( backgroundMusic , { channel=1 , loops=-1} )
+     if _G.musicOn == 1 then
+          audio.play( backgroundMusic , { channel=1 , loops=-1} )
+     end
+
 
 
 
@@ -516,7 +560,6 @@ function scene:show( event )
           counter = 0
           Runtime:addEventListener("touch",touch)
           Runtime:addEventListener( "collision", onCollision )
-          trans1()
 
 
 
@@ -542,6 +585,7 @@ function scene:hide( event )
                    table.remove( lastLine, i )
               end
          end
+         display.remove( obj )
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
           physics.pause()

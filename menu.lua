@@ -1,4 +1,5 @@
 
+
 local composer = require( "composer" )
 local scene = composer.newScene()
 
@@ -8,6 +9,9 @@ local coronaAds = require( "plugin.coronaAds" )
 -- Substitute your own placement IDs when generated
 local bannerPlacement = "bottom-banner-320x50"
 --local interstitialPlacement = "interstitial-1"
+
+_G.soundOn = 1
+_G.musicOn = 1
 
 -- Corona Ads listener function
 local function adListener( event )
@@ -33,6 +37,7 @@ end
 local function onPlayBtnRelease()
 
 	-- go to level1.lua scene
+     composer.removeScene( "level1" )
 	composer.gotoScene( "level1", "fade", 500 )
 
 	return true	-- indicates successful touch
@@ -44,10 +49,32 @@ local function onhighBtnRelease()
      --composer.removeScene( "highscores")
     composer.setVariable( "finalScore", score )
     composer.removeScene( "highscores" )
-    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
+    composer.gotoScene( "highscores", "fade", 500 )
 
 	return true	-- indicates successful touch
 end
+
+local function onHowToBtn()
+
+	-- go to level1.lua scene
+     --composer.removeScene( "highscores")
+    composer.removeScene( "tut1")
+    composer.gotoScene( "tut1", "fade", 500 )
+
+	return true	-- indicates successful touch
+end
+
+local function onSoundBtnRelease()
+     _G.musicOn = 1
+
+end
+
+local function onMusicBtnRelease()
+
+     _G.musicOn = 0
+
+end
+
 function scene:create( event )
 	local sceneGroup = self.view
 
@@ -64,32 +91,55 @@ function scene:create( event )
 	background.y = 0 + display.screenOriginY
 
 	-- create/position logo/title image on upper-half of the screen
-	local titleLogo = display.newImageRect( "logo.png", 264, 42 )
+	local titleLogo = display.newImageRect( "logo.png", 313, 50 )
 	titleLogo.x = display.contentCenterX
 	titleLogo.y = 100
 
 	-- create a widget button (which will loads level1.lua on release)
 	playBtn = widget.newButton{
-		label="Play Now",
-		labelColor = { default={255}, over={128} },
-		default="button.png",
-		over="button-over.png",
-		width=154, height=40,
+		defaultFile ="playBtn.png",
+		overFile="playBtnOver.PNG",
+		width=170, height=79,
 		onRelease = onPlayBtnRelease	-- event listener function
 	}
 	playBtn.x = display.contentCenterX
-	playBtn.y = display.contentHeight - 185
+	playBtn.y = display.contentHeight - 275
 
      highBtn = widget.newButton{
-		label="High Scores ",
-		labelColor = { default={255}, over={128} },
-		default="button.png",
-		over="button-over.png",
-		width=154, height=40,
+		defaultFile="highBtn.png",
+		overFile="highBtnOver.PNG",
+		width=170, height=79,
 		onRelease = onhighBtnRelease	-- event listener function
 	}
 	highBtn.x = display.contentCenterX
-	highBtn.y = display.contentHeight -125
+	highBtn.y = display.contentHeight -205
+
+     howBtn = widget.newButton{
+		defaultFile="howToBtn.png",
+		overFile="howToBtnOver.png",
+		width=170, height=79,
+		onRelease = onHowToBtn	-- event listener function
+	}
+	howBtn.x = display.contentCenterX
+	howBtn.y = display.contentHeight -135
+
+     local musicBtn = widget.newButton{
+		defaultFile="musicBtn.png",
+		overFile="musicBtnOver.png",
+		width=70, height=70,
+		onRelease = onMusicBtnRelease	-- event listener function
+	}
+	musicBtn.x = display.contentCenterX + 50
+	musicBtn.y = display.contentHeight - 60
+
+     local soundBtn = widget.newButton{
+		defaultFile="soundBtn.png",
+		overFile="soundBtnOver.png",
+		width=70, height=70,
+		onRelease = onSoundBtnRelease	-- event listener function
+	}
+	soundBtn.x = display.contentCenterX - 50
+	soundBtn.y = display.contentHeight - 60
 
 
 
@@ -101,6 +151,9 @@ function scene:create( event )
 	sceneGroup:insert( titleLogo )
 	sceneGroup:insert( playBtn )
      sceneGroup:insert( highBtn )
+     sceneGroup:insert( musicBtn )
+     sceneGroup:insert( soundBtn )
+     sceneGroup:insert( howBtn )
 
 end
 
