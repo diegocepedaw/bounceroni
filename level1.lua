@@ -16,8 +16,8 @@ physics.start()
 
 local sheetInfo = require("spriteData")
 local myImageSheet = graphics.newImageSheet( "spriteTextures.png", sheetInfo:getSheet() )
-local bounceInfo = require("bounceSmall")
-local bounceSheet = graphics.newImageSheet( "bounceSmall.png", bounceInfo:getSheet() )
+local bounceInfo = require("bounceSmallClean")
+local bounceSheet = graphics.newImageSheet( "bounceSmallClean.png", bounceInfo:getSheet() )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -55,7 +55,9 @@ local over = audio.loadSound( "over.wav")
 local hsSound = audio.loadSound( "newHs.ogg")
 local backgroundMusic = audio.loadStream( "beetle.mp3" )
 local typeOfPlanet
+local lastObstacle = 1000
 audio.setVolume( 0.1, { channel=1 } )
+math.randomseed( os.time() )
 
 
 local json = require( "json" )
@@ -69,14 +71,14 @@ local sequences_blobBounce = {
 
     {
         name = "normalBounce",
-        frames ={10,8,7,6,5,4,3,3,2,1},
+        frames ={10,9,8,7,6,5,4,3,2,1},
         time = 300,
         loopCount = 1
    },
 
    {
        name = "fastBounce",
-       frames ={10,8,7,6,5,4,3,3,2,1},
+       frames ={10,9,8,7,6,5,4,3,3,2,1},
        time = 200,
        loopCount = 1
    }
@@ -157,10 +159,10 @@ function touch(e)
              rect:setFillColor(r,g,b )
 
              if totalLen > 20  then
-                  physics.addBody( rect, "static", {bounce=1.28} )
+                  physics.addBody( rect, "static", {bounce=1.5} )
 
              else
-                   physics.addBody( rect, "static", {bounce=0.8} )
+                   physics.addBody( rect, "static", {bounce=1.5} )
              end
              rect.y = rect.y - redCount
              camera:add(rect,2,false)
@@ -195,15 +197,15 @@ end
 
 
 local function createObstacle()
-
+     --360, 570
      local typeOfObstacle = math.random( 2 )
      if typeOfObstacle == 1 then
           --stars sends things flying
-          local newStar =  display.newImageRect( myImageSheet, 15, 50, 50 )
+          local newStar =  display.newImageRect( myImageSheet, 6, 50, 50 )
           table.insert( objectTable, newStar )
           outerGroup:insert(newStar)
-          newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
-          newStar.y = 0 -((math.random(1,2)*2)-2)*math.random(1,500)  - redCount
+          newStar.x = math.random(60, 300)
+          newStar.y = redHerring.y - math.random(300, 700)
           physics.addBody( newStar, "static", { radius=15, bounce=1 } )
           newStar.myName = "star"
           newStar.isSensor = true
@@ -212,14 +214,14 @@ local function createObstacle()
      if typeOfObstacle== 2 then
           --planet bumps and starts falling
 
-          typeOfPlanet = math.random( 3 )
+          typeOfPlanet = math.random( 5 )
           local planetType
-          if typeOfPlanet == 1 or typeOfPlanet == 4 or typeOfPlanet == 6 then
-               local newPlanet =  display.newImageRect( myImageSheet, 12, 60, 60 )
+          if typeOfPlanet == 1 then
+               local newPlanet =  display.newImageRect( myImageSheet, 1, 50, 50 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
-               newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
-               newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
+               newPlanet.x = math.random(80, 270)
+               newPlanet.y = redHerring.y - math.random(300, 700)
                physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
                newPlanet.myName = "planet"
                newPlanet.gravityScale = 0
@@ -228,24 +230,50 @@ local function createObstacle()
           end
           if typeOfPlanet == 2   then
 
-               local newPlanet =  display.newImageRect( myImageSheet, 13, 110, 70 )
+               local newPlanet =  display.newImageRect( myImageSheet, 2, 110, 70 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
-               newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
-               newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
+               newPlanet.x = math.random(80, 270)
+               newPlanet.y = redHerring.y - math.random(300, 700)
                physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
                newPlanet.myName = "planet"
                newPlanet.gravityScale = 0
                camera:add(newPlanet,2,false)
                typeOfPlanet = math.random( 3 )
           end
-          if typeOfPlanet == 3 or typeOfPlanet == 5 or typeOfPlanet == 7 then
+          if typeOfPlanet == 3 then
 
-               local newPlanet =  display.newImageRect( myImageSheet, 14, 60, 60 )
+               local newPlanet =  display.newImageRect( myImageSheet, 3, 90, 60 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
-               newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
-               newPlanet.y =0 - ((math.random(1,2)*2)-2)* math.random(1,500) -redCount
+               newPlanet.x = math.random(80, 270)
+               newPlanet.y = redHerring.y - math.random(300, 700)
+               physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
+               newPlanet.myName = "planet"
+               newPlanet.gravityScale = 0
+               camera:add(newPlanet,2,false)
+               typeOfPlanet = math.random( 3 )
+          end
+          if typeOfPlanet == 4   then
+
+               local newPlanet =  display.newImageRect( myImageSheet, 4, 70, 70 )
+               table.insert( objectTable, newPlanet )
+               outerGroup:insert(newPlanet)
+               newPlanet.x = math.random(80, 270)
+               newPlanet.y = redHerring.y - math.random(300, 700)
+               physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
+               newPlanet.myName = "planet"
+               newPlanet.gravityScale = 0
+               camera:add(newPlanet,2,false)
+               typeOfPlanet = math.random( 3 )
+          end
+          if typeOfPlanet == 5  then
+
+               local newPlanet =  display.newImageRect( myImageSheet, 5, 60, 60 )
+               table.insert( objectTable, newPlanet )
+               outerGroup:insert(newPlanet)
+               newPlanet.x = math.random(80, 270)
+               newPlanet.y = redHerring.y - math.random(300, 700)
                physics.addBody( newPlanet, "dynamic", {bounce = 0.6, density = 0.2})
                newPlanet.myName = "planet"
                newPlanet.gravityScale = 0
@@ -267,7 +295,8 @@ local function restorestar(obj)
 
     balloon:setLinearVelocity( 0, 0 )
     balloon.y = balloon.y -10
-    local xForce = ((math.random(1,2)*2)-3)/5
+    local xForce = math.random(-0.2,0.2)
+    local yForce = math.random(-0.04, -0.06)
     balloon:applyLinearImpulse( xForce, -0.1, balloon.x, balloon.y )
 
     -- Fade in the ship
@@ -280,7 +309,7 @@ end
 
 
 local function moreObstacles()
-     if addOn > 45 then
+     if addOn > 36 then
           timer.performWithDelay(100, createObstacle, 1)
      end
      --timer.performWithDelay(100, createObstacle, 1)
@@ -369,13 +398,14 @@ local function onCollision( event )
                   redCount = redCount + addOn
 
 
-             if addOn < 150 then
+             if addOn < 100 and counter%3 == 0 then
                addOn = addOn + 1
              end
               counter = counter + 1
 
-              if counter == 5 then
+              if counter >= 5 and lastObstacle - balloon.y > 100 then
                    counter = 0
+                   lastObstacle = balloon.y
                    moreObstacles()
               end
 
@@ -511,6 +541,7 @@ function scene:create( event )
 
     --physics.addBody( platform, "static" )
     physics.addBody( balloon, "dynamic", { radius=15, bounce=0 } )
+    balloon.linearDamping = 0.3
     balloon.isFixedRotation = true
 
     camera:add(background,2,false)
@@ -529,7 +560,7 @@ function scene:create( event )
 
     tapText:setFillColor( 0, 0, 0 )
 
-    obj = display.newImageRect( "touch.png", 40, 40)
+    obj = display.newImageRect( myImageSheet, 7, 40, 40 )
     obj.x = display.contentCenterX - 40
     obj.y = 350
     local firstTran = transition.to(obj, {time=430, x=display.contentCenterX + 40, onComplete=trans2})
@@ -555,7 +586,7 @@ function scene:create( event )
 
 
 
-	--creator = timer.performWithDelay( 5000, moreObstacles, 0 )
+	--creator = timer.performWithDelay( 5000, acles, 0 )
 
 
 	--gameLoopTimer = timer.performWithDelay( 500, test, 0 )
