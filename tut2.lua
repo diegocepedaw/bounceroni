@@ -1,7 +1,7 @@
 local composer = require( "composer" )
 
 local scene = composer.newScene()
-local highScoresHeader 
+local highScoresHeader
 
 local function gotoNext()
     composer.removeScene( "tut3")
@@ -20,7 +20,8 @@ function scene:create( event )
 
     highScoresHeader = display.newText( sceneGroup, "Next", display.contentCenterX, 100, "IndieFlower.ttf", 40 )
     highScoresHeader:addEventListener( "tap", gotoNext )
-
+    highScoresHeader.x = display.contentCenterX + 90
+    highScoresHeader.y = display.contentCenterY - 208
 
 
 

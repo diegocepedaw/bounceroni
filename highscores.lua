@@ -101,7 +101,7 @@ function scene:create( event )
             local yPos = 100 + ( i * 56 )
 
             local rankNum = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, "IndieFlower.ttf", 36 )
-            rankNum:setFillColor( 0.8 )
+            rankNum:setFillColor( 0.9 )
             rankNum.anchorX = 1
 
             local thisScore = display.newText( sceneGroup, scoresTable[i], display.contentCenterX-30, yPos, "IndieFlower.ttf", 36 )

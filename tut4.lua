@@ -19,7 +19,8 @@ function scene:create( event )
 
 
      highScoresHeader = display.newText( sceneGroup, "Next", display.contentCenterX, 100, "IndieFlower.ttf", 40 )
-
+     highScoresHeader.x = display.contentCenterX + 90
+     highScoresHeader.y = display.contentCenterY - 208
 
 
 

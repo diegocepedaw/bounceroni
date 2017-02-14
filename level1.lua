@@ -14,6 +14,10 @@ local scene = composer.newScene()
 local physics = require("physics")
 physics.start()
 
+local sheetInfo = require("spriteData")
+local myImageSheet = graphics.newImageSheet( "spriteTextures.png", sheetInfo:getSheet() )
+local bounceInfo = require("bounceSmall")
+local bounceSheet = graphics.newImageSheet( "bounceSmall.png", bounceInfo:getSheet() )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -49,7 +53,7 @@ local bumpSound = audio.loadSound( "bump.wav" )
 local launchSound = audio.loadSound( "star.wav" )
 local over = audio.loadSound( "over.wav")
 local hsSound = audio.loadSound( "newHs.ogg")
-local backgroundMusic = audio.loadStream( "background.wav" )
+local backgroundMusic = audio.loadStream( "beetle.mp3" )
 local typeOfPlanet
 audio.setVolume( 0.1, { channel=1 } )
 
@@ -59,6 +63,24 @@ local json = require( "json" )
 local scoresTable = {}
 
 local filePath = system.pathForFile( "scores.json", system.DocumentsDirectory )
+
+-- sequences table
+local sequences_blobBounce = {
+
+    {
+        name = "normalBounce",
+        frames ={10,8,7,6,5,4,3,3,2,1},
+        time = 300,
+        loopCount = 1
+   },
+
+   {
+       name = "fastBounce",
+       frames ={10,8,7,6,5,4,3,3,2,1},
+       time = 200,
+       loopCount = 1
+   }
+}
 
 local function loadScores()
 
@@ -177,7 +199,7 @@ local function createObstacle()
      local typeOfObstacle = math.random( 2 )
      if typeOfObstacle == 1 then
           --stars sends things flying
-          local newStar =  display.newImageRect( "saucer.gif", 50, 50 )
+          local newStar =  display.newImageRect( myImageSheet, 15, 50, 50 )
           table.insert( objectTable, newStar )
           outerGroup:insert(newStar)
           newStar.x = redHerring.x- ((math.random(1,2)*2)-3)*math.random(1,200)
@@ -193,8 +215,7 @@ local function createObstacle()
           typeOfPlanet = math.random( 3 )
           local planetType
           if typeOfPlanet == 1 or typeOfPlanet == 4 or typeOfPlanet == 6 then
-               planetType =   "planet1.png"
-               local newPlanet =  display.newImageRect( "planet1.PNG", 60, 60 )
+               local newPlanet =  display.newImageRect( myImageSheet, 12, 60, 60 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
@@ -206,8 +227,8 @@ local function createObstacle()
                typeOfPlanet = math.random( 3 )
           end
           if typeOfPlanet == 2   then
-               planetType =   "planet2.png"
-               local newPlanet =  display.newImageRect( "planet2.png", 70, 70 )
+
+               local newPlanet =  display.newImageRect( myImageSheet, 13, 110, 70 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
@@ -219,8 +240,8 @@ local function createObstacle()
                typeOfPlanet = math.random( 3 )
           end
           if typeOfPlanet == 3 or typeOfPlanet == 5 or typeOfPlanet == 7 then
-               planetType =  "planet3.png"
-               local newPlanet =  display.newImageRect( "planet3.png", 60, 60 )
+
+               local newPlanet =  display.newImageRect( myImageSheet, 14, 60, 60 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = redHerring.x - ((math.random(1,2)*2)-3)* math.random(1,200)
@@ -262,7 +283,7 @@ local function moreObstacles()
      if addOn > 45 then
           timer.performWithDelay(100, createObstacle, 1)
      end
-     timer.performWithDelay(100, createObstacle, 1)
+     --timer.performWithDelay(100, createObstacle, 1)
      timer.performWithDelay(100, createObstacle, 1)
 end
 
@@ -341,6 +362,8 @@ local function onCollision( event )
         then
              audio.play( bounceSound , { channel=2 } )
              audio.setVolume( 0.3, { channel=2 } )
+             balloon:setSequence("normalBounce")
+             balloon:play()
              if redHerring.y ~= nil then
                   redHerring.y = redHerring.y - addOn
                   redCount = redCount + addOn
@@ -408,6 +431,8 @@ local function onCollision( event )
         end
 
         if ( obj1.myName == "planet" and obj2.myName == "balloon" ) then
+             balloon:setSequence("fastBounce")
+             balloon:play()
              obj1.gravityScale = 0.75
              obj1:applyTorque(3)
              local soundChannel = audio.play( bumpSound )
@@ -477,7 +502,7 @@ function scene:create( event )
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
-    balloon =  display.newImageRect( "blob.png", 35, 35 )
+    balloon =   display.newSprite( bounceSheet, sequences_blobBounce)
     balloon.myName = "balloon"
     balloon.x = display.contentCenterX
     balloon.y = display.contentCenterY
