@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:197fbbb283068a7d82011199ce95842f:4a3bd2a170a34f6a4bf2e2632247a73a:95bbf7adb6676736cab2b88f5e8bb979$
+-- $TexturePacker:SmartUpdate:f47d2263e4b8de6828185bb6b53e2fd1:d98937dca7e3425113aabcb06de61ad6:95bbf7adb6676736cab2b88f5e8bb979$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -13,11 +13,19 @@ local SheetInfo = {}
 SheetInfo.sheet =
 {
     frames = {
-    
+
+        {
+            -- arrow-sketches-collection_23-2147499252
+            x=179,
+            y=366,
+            width=216,
+            height=70,
+
+        },
         {
             -- planet1
-            x=272,
-            y=1,
+            x=1,
+            y=362,
             width=176,
             height=185,
 
@@ -52,8 +60,8 @@ SheetInfo.sheet =
         },
         {
             -- planet4
-            x=1,
-            y=362,
+            x=272,
+            y=1,
             width=174,
             height=179,
 
@@ -65,7 +73,7 @@ SheetInfo.sheet =
         {
             -- planet5
             x=266,
-            y=188,
+            y=182,
             width=176,
             height=182,
 
@@ -76,8 +84,8 @@ SheetInfo.sheet =
         },
         {
             -- saucer
-            x=177,
-            y=372,
+            x=179,
+            y=438,
             width=142,
             height=136,
 
@@ -88,8 +96,8 @@ SheetInfo.sheet =
         },
         {
             -- touch
-            x=321,
-            y=372,
+            x=323,
+            y=438,
             width=100,
             height=121,
 
@@ -99,21 +107,22 @@ SheetInfo.sheet =
             sourceHeight = 129
         },
     },
-    
-    sheetContentWidth = 449,
-    sheetContentHeight = 542
+
+    sheetContentWidth = 447,
+    sheetContentHeight = 575
 }
 
 SheetInfo.frameIndex =
 {
 
-    ["planet1"] = 1,
-    ["planet2"] = 2,
-    ["planet3"] = 3,
-    ["planet4"] = 4,
-    ["planet5"] = 5,
-    ["saucer"] = 6,
-    ["touch"] = 7,
+    ["arrow-sketches-collection_23-2147499252"] = 1,
+    ["planet1"] = 2,
+    ["planet2"] = 3,
+    ["planet3"] = 4,
+    ["planet4"] = 5,
+    ["planet5"] = 6,
+    ["saucer"] = 7,
+    ["touch"] = 8,
 }
 
 function SheetInfo:getSheet()

@@ -56,6 +56,7 @@ local hsSound = audio.loadSound( "newHs.ogg")
 local backgroundMusic = audio.loadStream( "beetle.mp3" )
 local typeOfPlanet
 local lastObstacle = 1000
+local arrow
 audio.setVolume( 0.1, { channel=1 } )
 math.randomseed( os.time() )
 
@@ -72,7 +73,7 @@ local sequences_blobBounce = {
     {
         name = "normalBounce",
         frames ={10,9,8,7,6,5,4,3,2,1},
-        time = 300,
+        time = 275,
         loopCount = 1
    },
 
@@ -141,6 +142,7 @@ function touch(e)
         if group ~= nil then
 
              display.remove( obj )
+             display.remove( arrow )
              local len, angle = lengthOf( group.e, e ), angleOf( group.e, e )
              totalLen = totalLen + len
              if totalLen > 100 then
@@ -201,7 +203,7 @@ local function createObstacle()
      local typeOfObstacle = math.random( 2 )
      if typeOfObstacle == 1 then
           --stars sends things flying
-          local newStar =  display.newImageRect( myImageSheet, 6, 50, 50 )
+          local newStar =  display.newImageRect( myImageSheet, 7, 50, 50 )
           table.insert( objectTable, newStar )
           outerGroup:insert(newStar)
           newStar.x = math.random(60, 300)
@@ -217,7 +219,7 @@ local function createObstacle()
           typeOfPlanet = math.random( 5 )
           local planetType
           if typeOfPlanet == 1 then
-               local newPlanet =  display.newImageRect( myImageSheet, 1, 50, 50 )
+               local newPlanet =  display.newImageRect( myImageSheet, 2, 50, 50 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = math.random(80, 270)
@@ -230,7 +232,7 @@ local function createObstacle()
           end
           if typeOfPlanet == 2   then
 
-               local newPlanet =  display.newImageRect( myImageSheet, 2, 110, 70 )
+               local newPlanet =  display.newImageRect( myImageSheet, 3, 110, 70 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = math.random(80, 270)
@@ -243,7 +245,7 @@ local function createObstacle()
           end
           if typeOfPlanet == 3 then
 
-               local newPlanet =  display.newImageRect( myImageSheet, 3, 90, 60 )
+               local newPlanet =  display.newImageRect( myImageSheet, 4, 90, 60 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = math.random(80, 270)
@@ -256,7 +258,7 @@ local function createObstacle()
           end
           if typeOfPlanet == 4   then
 
-               local newPlanet =  display.newImageRect( myImageSheet, 4, 70, 70 )
+               local newPlanet =  display.newImageRect( myImageSheet, 5, 70, 70 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = math.random(80, 270)
@@ -269,7 +271,7 @@ local function createObstacle()
           end
           if typeOfPlanet == 5  then
 
-               local newPlanet =  display.newImageRect( myImageSheet, 5, 60, 60 )
+               local newPlanet =  display.newImageRect( myImageSheet, 6, 60, 60 )
                table.insert( objectTable, newPlanet )
                outerGroup:insert(newPlanet)
                newPlanet.x = math.random(80, 270)
@@ -309,7 +311,7 @@ end
 
 
 local function moreObstacles()
-     if addOn > 36 then
+     if addOn > 60 then
           timer.performWithDelay(100, createObstacle, 1)
      end
      --timer.performWithDelay(100, createObstacle, 1)
@@ -330,11 +332,13 @@ local function gameLoop()
         then
              balloon.x = display.contentWidth
              balloon.y = balloon.y + 10
+             balloon:applyLinearImpulse( -0.02, 0, balloon.x, balloon.y )
         end
         if ( balloon.x > display.contentWidth + 5)
         then
              balloon.x = 0
              balloon.y = balloon.y + 10
+             balloon:applyLinearImpulse( 0.02, 0, balloon.x, balloon.y )
         end
         if (balloon.y ~= nil and redHerring.y ~= nil) then
 
@@ -535,7 +539,7 @@ function scene:create( event )
     balloon =   display.newSprite( bounceSheet, sequences_blobBounce)
     balloon.myName = "balloon"
     balloon.x = display.contentCenterX
-    balloon.y = display.contentCenterY
+    balloon.y = display.contentCenterY - 55
     balloon.gravityScale = 2
 
 
@@ -560,10 +564,16 @@ function scene:create( event )
 
     tapText:setFillColor( 0, 0, 0 )
 
-    obj = display.newImageRect( myImageSheet, 7, 40, 40 )
+    arrow = display.newImageRect( myImageSheet, 1, 130, 50 )
+    arrow.x = display.contentCenterX + 10
+    arrow.y = 280
+
+    obj = display.newImageRect( myImageSheet, 8, 40, 40 )
     obj.x = display.contentCenterX - 40
-    obj.y = 350
-    local firstTran = transition.to(obj, {time=430, x=display.contentCenterX + 40, onComplete=trans2})
+    obj.y = 300
+    local firstTran = transition.to(obj, {time=600, x=display.contentCenterX + 40, onComplete=trans2})
+
+
 
 
      r,g,b = math.random(0.2,1), math.random(0.2,1), math.random(0.2,1)
@@ -613,9 +623,10 @@ function scene:show( event )
 		-- Code here runs when the scene is entirely on screen
 
 		gameLoopTimer = timer.performWithDelay( 20, gameLoop, 0 )
-          counter = 0
+          counter = 3
           Runtime:addEventListener("touch",touch)
           Runtime:addEventListener( "collision", onCollision )
+
 
 
 
@@ -642,6 +653,7 @@ function scene:hide( event )
               end
          end
          display.remove( obj )
+         display.remove( arrow )
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
           physics.pause()

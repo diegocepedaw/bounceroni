@@ -12,6 +12,26 @@ local bannerPlacement = "bottom-banner-320x50"
 
 _G.soundOn = 1
 _G.musicOn = 1
+local soundOn = true
+local soundOnBtn
+local soundOffBtn
+local bot
+
+local function soundToggle(event)
+    if soundOn then
+        soundOn = false
+        _G.musicOn = 0
+        soundOnBtn.isVisible = false
+        soundOffBtn.isVisible = true
+    else
+        soundOn = true
+        _G.musicOn = 1
+        soundOnBtn.isVisible = true
+        soundOffBtn.isVisible = false
+    end
+    return true
+end
+
 
 -- Corona Ads listener function
 local function adListener( event )
@@ -95,6 +115,26 @@ function scene:create( event )
 	titleLogo.x = display.contentCenterX
 	titleLogo.y = 100
 
+
+
+
+     soundOnBtn = display.newImageRect("MusicOn.png", 170, 79)
+     soundOnBtn.x = display.contentCenterX
+     soundOnBtn.y = display.contentHeight - 60
+     soundOnBtn.isVisible = true
+     soundOnBtn:addEventListener("tap", soundToggle)
+
+     soundOffBtn = display.newImageRect("musicOff.PNG", 170, 79)
+     soundOffBtn.x = display.contentCenterX
+     soundOffBtn.y = display.contentHeight - 60
+     --sceneGroup:insert(soundOffBtn)
+     soundOffBtn:addEventListener("tap", soundToggle)
+
+
+     soundOffBtn.isVisible = false
+
+
+
 	-- create a widget button (which will loads level1.lua on release)
 	playBtn = widget.newButton{
 		defaultFile ="playBtn.png",
@@ -102,6 +142,8 @@ function scene:create( event )
 		width=170, height=79,
 		onRelease = onPlayBtnRelease	-- event listener function
 	}
+
+
 	playBtn.x = display.contentCenterX
 	playBtn.y = display.contentHeight - 275
 
@@ -123,23 +165,8 @@ function scene:create( event )
 	howBtn.x = display.contentCenterX
 	howBtn.y = display.contentHeight -135
 
-     local musicBtn = widget.newButton{
-		defaultFile="musicBtn.png",
-		overFile="musicBtnOver.png",
-		width=70, height=70,
-		onRelease = onMusicBtnRelease	-- event listener function
-	}
-	musicBtn.x = display.contentCenterX + 50
-	musicBtn.y = display.contentHeight - 60
 
-     local soundBtn = widget.newButton{
-		defaultFile="soundBtn.png",
-		overFile="soundBtnOver.png",
-		width=70, height=70,
-		onRelease = onSoundBtnRelease	-- event listener function
-	}
-	soundBtn.x = display.contentCenterX - 50
-	soundBtn.y = display.contentHeight - 60
+
 
 
 
@@ -151,9 +178,9 @@ function scene:create( event )
 	sceneGroup:insert( titleLogo )
 	sceneGroup:insert( playBtn )
      sceneGroup:insert( highBtn )
-     sceneGroup:insert( musicBtn )
-     sceneGroup:insert( soundBtn )
      sceneGroup:insert( howBtn )
+     sceneGroup:insert(soundOnBtn)
+     sceneGroup:insert(soundOffBtn)
 
 end
 
