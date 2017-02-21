@@ -5,9 +5,7 @@ local scene = composer.newScene()
 
 -- include Corona's "widget" library
 local widget = require "widget"
-local coronaAds = require( "plugin.coronaAds" )
--- Substitute your own placement IDs when generated
-local bannerPlacement = "bottom-banner-320x50"
+
 --local interstitialPlacement = "interstitial-1"
 
 _G.soundOn = 1
@@ -15,7 +13,44 @@ _G.musicOn = 1
 local soundOn = true
 local soundOnBtn
 local soundOffBtn
-local bot
+
+local ads = require( "ads" )
+local bannerAppID = "ca-app-pub-9500453081096402/5560209378"  --for your iOS banner
+local interstitialAppID = "ca-app-pub-nnnnnnnnnnn/nnnnnnnn"  --for your iOS interstitial
+if ( system.getInfo( "platformName" ) == "Android" ) then
+    bannerAppID = "ca-app-pub-9500453081096402/2606742973"  --for your Android banner
+    interstitialAppID = "ca-app-pub-nnnnnnnnnnn/nnnnnnnnn"  --for your Android interstitial
+end
+
+local adProvider = "admob"
+local function adListener( event )
+    --(more on this later)
+end
+
+local function adListener( event )
+    -- The 'event' table includes:
+    -- event.name: string value of "adsRequest"
+    -- event.response: message from the ad provider about the status of this request
+    -- event.phase: string value of "loaded", "shown", or "refresh"
+    -- event.type: string value of "banner" or "interstitial"
+    -- event.isError: boolean true or false
+
+    local msg = event.response
+    -- Quick debug message regarding the response from the library
+    print( "Message from the ads library: ", msg )
+
+    if ( event.isError ) then
+        print( "Error, no ad received", msg )
+
+
+    else
+        print( "Ah ha! Got one!" )
+    end
+end
+
+
+ads.init( adProvider, "ca-app-pub-8636924388798547/1992452115", adListener )
+ads.show( "banner", { x=0, y=100000, appId="ca-app-pub-8636924388798547/1992452115" } )
 
 local function soundToggle(event)
     if soundOn then
@@ -33,16 +68,7 @@ local function soundToggle(event)
 end
 
 
--- Corona Ads listener function
-local function adListener( event )
 
-   -- Successful initialization of Corona Ads
-   if ( event.phase == "init" ) then
-     -- Show an ad
-     coronaAds.show( bannerPlacement, false )
-     --coronaAds.show( interstitialPlacement, true )
-   end
-end
 --------------------------------------------
 
 -- forward declarations and other locals
@@ -104,7 +130,7 @@ function scene:create( event )
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
 
 	-- display a background image
-	local background = display.newImageRect( "background.png", display.actualContentWidth, display.actualContentHeight )
+	local background = display.newImageRect( "background2.png", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX
@@ -118,13 +144,13 @@ function scene:create( event )
 
 
 
-     soundOnBtn = display.newImageRect("MusicOn.png", 170, 79)
+     soundOnBtn = display.newImageRect("MusicOn.PNG", 170, 79)
      soundOnBtn.x = display.contentCenterX
      soundOnBtn.y = display.contentHeight - 60
      soundOnBtn.isVisible = true
      soundOnBtn:addEventListener("tap", soundToggle)
 
-     soundOffBtn = display.newImageRect("musicOff.PNG", 170, 79)
+     soundOffBtn = display.newImageRect("musicOff.png", 170, 79)
      soundOffBtn.x = display.contentCenterX
      soundOffBtn.y = display.contentHeight - 60
      --sceneGroup:insert(soundOffBtn)
@@ -171,7 +197,6 @@ function scene:create( event )
 
 
     -- Initialize Corona Ads (substitute your own API key when generated)
-    coronaAds.init( "b658f8b9-74d9-41de-b282-1b26ebec6683", adListener )
 
 	-- all display objects must be inserted into group
 	sceneGroup:insert( background )
@@ -189,9 +214,10 @@ function scene:show( event )
 	local phase = event.phase
 
 	if phase == "will" then
+
+
 		-- Called when the scene is still off screen and is about to move on screen
-          coronaAds.show( bannerPlacement, false )
-	elseif phase == "did" then
+
 		-- Called when the scene is now on screen
 		--
 		-- INSERT code here to make the scene come alive
@@ -209,7 +235,7 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
           --coronaAds.hide( bannerPlacement, false )
-          coronaAds.hide( bannerPlacement )
+
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 

@@ -18,6 +18,8 @@ local sheetInfo = require("spriteData")
 local myImageSheet = graphics.newImageSheet( "spriteTextures.png", sheetInfo:getSheet() )
 local bounceInfo = require("bounceSmallClean")
 local bounceSheet = graphics.newImageSheet( "bounceSmallClean.png", bounceInfo:getSheet() )
+local rocketInfo = require("rocket-_65")
+local rocketSheet = graphics.newImageSheet( "rocket-_65.png", rocketInfo:getSheet() )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -52,11 +54,14 @@ local bounceSound = audio.loadSound( "bounce.wav" )
 local bumpSound = audio.loadSound( "bump.wav" )
 local launchSound = audio.loadSound( "star.wav" )
 local over = audio.loadSound( "over.wav")
-local hsSound = audio.loadSound( "newHs.ogg")
+local hsSound = audio.loadSound( "high.ogg")
+local rocketSound = audio.loadSound( "rocket.wav")
 local backgroundMusic = audio.loadStream( "beetle.mp3" )
 local typeOfPlanet
 local lastObstacle = 1000
 local arrow
+
+
 audio.setVolume( 0.1, { channel=1 } )
 math.randomseed( os.time() )
 
@@ -85,6 +90,16 @@ local sequences_blobBounce = {
    }
 }
 
+local sequences_rocket = {
+
+    {
+        name = "rocket",
+        frames ={1,2,3},
+        time = 400,
+        loopCount = 0
+   }
+}
+
 local function loadScores()
 
     local file = io.open( filePath, "r" )
@@ -95,7 +110,7 @@ local function loadScores()
         scoresTable = json.decode( contents )
     end
 
-    if ( scoresTable == nil or #scoresTable == 0 ) then
+    if ( scoresTable == nil or #scoresTable == 0  ) then
         scoresTable = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     end
 end
@@ -355,9 +370,13 @@ local function gameLoop()
 
          if (score > scoresTable[1]and hsFlag == 0) then
               hsFlag = 1
-              newHigh = display.newImage("hsBanner.png")
-              t1 = transition.to(newHigh, {time=4500, x=display.contentCenterX + 500 })
+              newHigh = display.newSprite( rocketSheet, sequences_rocket)
+              newHigh:setSequence("rocket")
+              newHigh:play()
+              t1 = transition.to(newHigh, {time=4000, x=display.contentCenterX + 500 })
               table.insert( objectTable, newHigh )
+              audio.play( rocketSound , { channel=3 } )
+              audio.setVolume( 0.05, { channel=3 } )
               local hsChannel = audio.play( hsSound )
           end
 
